@@ -50,6 +50,14 @@ public interface MultiSet<T implements Comparable> {
 	public MultiSet<T> add(T t);
 
 	/**
+	* Adds some number of T's to the multiset
+	* 
+	* @param t  the element of type T to add to the multiset
+	* @return a new multiset with the element added
+	*/
+	public MultiSet<T> add(T t, int num);
+
+	/**
 	* Removes an element T from the multiset if it's there. Only removes
 	* one if there are multiple with the same value.
 	*
@@ -57,6 +65,14 @@ public interface MultiSet<T implements Comparable> {
 	* @return the MultiSet with one less T of value t
 	*/
 	public MultiSet<T> remove(T t);
+
+	/**
+	* Removes some number of T's from the multiset if the t is present.
+	*
+	* @param t  the element of type T to remove from the multiset
+	* @return the MultiSet with one less T of value t
+	*/
+	public MultiSet<T> remove(T t, int num);
 
 	/**
 	* Creates the union of two multisets -- the returned set has all the 
