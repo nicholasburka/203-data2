@@ -7,7 +7,7 @@ JC = javac
 CLASSES = \
 	MultiSet.java \
 	Branch.java \
-	#Leaf.java \
+	Leaf.java \
 	#Tester.java 
 
 default: classes

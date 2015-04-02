@@ -1,4 +1,4 @@
-public class Leaf implements FiniteSet {
+public class Leaf<T extends Comparable<T>> implements MultiSet<T> {
 	Leaf () {}
 	
 	@Override public String toString() {
@@ -13,39 +13,51 @@ public class Leaf implements FiniteSet {
 		return true;
 	}
 
-	public Boolean member(int x) {
+	public Boolean member(T t) {
 		return false;
 	}
 
-	public FiniteSet add(int x) {
-		return new Branch (this, x, this);
+	public int multiplicity(T t) {
+		return 0;
 	}
 
-	public FiniteSet remove(int x) {
+	public MultiSet<T> add(T t) {
+		return new Branch<T> (this, t, 1, this);
+	}
+
+	public MultiSet<T> add(T t, int num) {
+		return new Branch<T> (this, t, num, this);
+	}
+
+	public MultiSet<T> remove(T t) {
 		return this;
 	}
 
-	public FiniteSet union(FiniteSet s) {
+	public MultiSet<T> remove(T t, int num) {
+		return this;
+	}
+
+	public MultiSet<T> union(MultiSet<T> s) {
 		return s;
 	}
 
-	public FiniteSet inter(FiniteSet s) {
+	public MultiSet<T> inter(MultiSet<T> s) {
 		return this;
 	}
 
-	public FiniteSet diff(FiniteSet s) {
+	public MultiSet<T> diff(MultiSet<T> s) {
 		return this;
 	}
 
-	public Boolean equal(FiniteSet s) {
+	public Boolean equal(MultiSet<T> s) {
 		return s.isEmptyHuh();
 	}
 
-	public Boolean subset(FiniteSet s) {
+	public Boolean subset(MultiSet<T> s) {
 		return true;
 	}
 
-	public int max() {
+	public T max() {
 		throw new RuntimeException();
 	}
 }
