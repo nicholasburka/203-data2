@@ -60,4 +60,20 @@ public class Leaf<T extends Comparable<T>> implements MultiSet<T> {
 	public T max() {
 		throw new RuntimeException();
 	}
+
+	//SEQUENCES
+	public Sequence<T> seq() {
+		return this;
+	}
+
+	//isEmptyHuh is singularly implemented :)
+
+	public T here() {
+		throw new RuntimeException("Nothin' here!");
+	}
+
+	public Sequence<T> next() {
+		//smh, calling next on a Leaf<T>
+		return this;
+	}
 }

@@ -11,6 +11,13 @@ public class Branch<T extends Comparable<T>> implements MultiSet<T> {
 		this.right = right;
 	}
 
+	//what's here
+	//what's next
+	//is there anything here?
+	//make a sequence that makes each thing appear x (multiplicity) times
+
+
+
 	@Override public String toString() {
 		return "new Branch(" + this.left + "," + this.key + "," + this.multiplicity + "," + this.right + ")";
 	}
@@ -139,6 +146,18 @@ public class Branch<T extends Comparable<T>> implements MultiSet<T> {
 		}
 	}
 
+	//TIME FOR SEQUENCES!!!
+	public Sequence<T> seq() {
+		return new BranchSequence<T>(new Concatenation<T>(this.left.seq(), this.right.seq()), this.key, this.multiplicity);
+	}
+
+	public T here() {
+		return this.seq().here();
+	}
+
+	public Sequence<T> next() {
+		return this.seq().next();
+	}
 
 
 }

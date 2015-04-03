@@ -2,7 +2,7 @@
 	PURE (and balanced) IMPLEMENTATION of a multiset
 */
 
-public interface MultiSet<T extends Comparable<T>> {
+public interface MultiSet<T extends Comparable<T>> extends Sequence<T> {
 
 	/**
 	* Returns the number of things in a multiset. Since multisets can have

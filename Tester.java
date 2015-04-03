@@ -1,7 +1,7 @@
 import java.util.Random;
 
 /*
-	Test suite for data1
+	Test suite for data2
 */
 
 public class Tester {
@@ -42,12 +42,14 @@ public class Tester {
 		printTest(c.testDescription, c.passed);
 		passed &= c.passed;
 
+		
 		setUpTest();
 		Empty e = new Empty();
 		e.procedure(NUM_TIMES, UPPER_BOUND, numElements);
 		printTest(e.testDescription, e.passed);
 		passed &= e.passed;
 
+		/*
 		setUpTest();
 		Remove r = new Remove();
 		r.procedure(NUM_TIMES, UPPER_BOUND, numElements);
@@ -83,7 +85,7 @@ public class Tester {
 		s.procedure(NUM_TIMES, UPPER_BOUND, numElements);
 		printTest(s.testDescription, s.passed);
 		passed &= s.passed;
-
+*/
 		return passed;
 	}
 
@@ -99,22 +101,42 @@ public class Tester {
 
 abstract class Test {
 	public static String testDescription;
-	public static Boolean passed;
+	public Boolean passed;
 
 	//should update passed at end of procedure
 	public abstract Boolean procedure(int numTimes, int upperBound, int numElements);
 
-	//generates a FiniteSet with numElements number of UNIQUE elements
-	public FiniteSet generateFiniteSet(int upperBound, int numElements) {
+	//generates a MultiSet with numElements number of elements (not necessarily unique)
+	public MultiSet<Integer> generateMultiSet(int upperBound, int numElements) {
 		if (upperBound < numElements) {
 			throw new RuntimeException("Need a larger upperBound to fit desired numElements");
 		} else {
-			FiniteSet set = new Leaf();
+			MultiSet<Integer> set = new Leaf<Integer>();
 			Random rand = new Random();
 			int next = 0;
 			for (int i = 0; i < numElements; i++) {
 				next = rand.nextInt(upperBound);
 
+
+				//REMEMBER TO ASSIGN SET TO RESULT OF EXPRESSION, because there's no mutation!
+				set = set.add(next);
+			}
+			return set;
+		}
+	}
+
+	//generates a MultiSet with numElements number of UNIQUE elements
+	public MultiSet<Integer> generateMultiSetUnique(int upperBound, int numElements) {
+		if (upperBound < numElements) {
+			throw new RuntimeException("Need a larger upperBound to fit desired numElements");
+		} else {
+			MultiSet<Integer> set = new Leaf<Integer>();
+			Random rand = new Random();
+			int next = 0;
+			for (int i = 0; i < numElements; i++) {
+				next = rand.nextInt(upperBound);
+
+				
 				//ensures uniqueness of added value
 				while (set.member(next)) {
 					next = rand.nextInt(upperBound);
@@ -129,12 +151,12 @@ abstract class Test {
 }
 
 class MakeSet extends Test {
-	public String testDescription = "Check that a FiniteSet contains all the elements added to it";
+	public String testDescription = "Check that a MultiSet of Integers contains all the elements added to it";
 
 	MakeSet() {}
 
 	public Boolean procedure(int numTimes, int upperBound, int numElements) {
-		FiniteSet set = new Leaf();
+		MultiSet<Integer> set = new Leaf<Integer>();
 		int[] nums = new int[numElements];
 		Random rand = new Random();
 		Boolean passed = true;
@@ -153,25 +175,25 @@ class MakeSet extends Test {
 				}
 			}
 		}
-		MakeSet.passed = passed;
+		this.passed = passed;
 		return passed;
 	}
 }
 
 class Cardinality extends Test {
-	public String testDescription = "Check that a FiniteSet has the number of unique elements added to it";
+	public String testDescription = "Check that a MultiSet of Integers has the number of elements added to it";
 
 	Cardinality() {}
 
 	public Boolean procedure(int numTimes, int upperBound, int numElements) {
-		FiniteSet set;
+		MultiSet<Integer> set;
 		for (int i = 0; i < numTimes; i++) {
-			set = generateFiniteSet(upperBound, numElements);
+			set = generateMultiSet(upperBound, numElements);
 			this.passed = set.cardinality() == numElements;
 			if (!passed) {
 				System.out.println("Cardinality of set " + set + " was not " + numElements);
 			}
-			set = new Leaf();
+			set = new Leaf<Integer>();
 			this.passed = set.cardinality() == 0;
 		}
 		this.passed = passed;
@@ -185,21 +207,21 @@ class Empty extends Test {
 	Empty() {}
 
 	public Boolean procedure(int numTimes, int upperBound, int numElements) {
-		FiniteSet set;
+		MultiSet<Integer> set;
 		for (int i = 0; i < numTimes; i++) {
-			set = new Leaf();
+			set = new Leaf<Integer>();
 			this.passed = set.isEmptyHuh();
 			if (!passed) {
 				System.out.println("Empty set " + set + " was not empty");
 			}
 
-			set = generateFiniteSet(upperBound, 1);
+			set = generateMultiSet(upperBound, 1);
 			this.passed = !(set.isEmptyHuh());
 			if (!passed) {
 				System.out.println("Nonempty set " + set + " was empty");
 			}
 
-			set = generateFiniteSet(upperBound, numElements);
+			set = generateMultiSet(upperBound, numElements);
 			this.passed = !(set.isEmptyHuh());
 
 			if (!passed) {
@@ -209,16 +231,17 @@ class Empty extends Test {
 		return this.passed;
 	}
 }
-
+/*
 //this test is especially slow because of naive removal implementation
 class Remove extends Test {
-	public String testDescription = "Check that sets containing elements no longer contain those elements after removal";
+	public String testDescription = "Check that sets containing elements contain one less of each of those elements after removal";
 
 	Remove() {}
 
 	public Boolean procedure(int numTimes, int upperBound, int numElements) {
-		FiniteSet set = new Leaf();
+		MultiSet<Integer> set = new Leaf<Integer>();
 		int[] nums = new int[numElements];
+
 		Random rand = new Random();
 		Boolean passed = true;
 		for (int h = 0; h < numTimes; h++) {
@@ -228,6 +251,9 @@ class Remove extends Test {
 			for (int j = 0; j < nums.length; j++) {
 				set = set.add(nums[j]);
 			}
+			for (int q = 0; q < nums.length; q++) {
+
+			} 
 			//System.out.println("Starting removals...");
 			for (int l = 0; l < nums.length; l++) {
 				set = set.remove(nums[l]);
@@ -252,9 +278,9 @@ class Union extends Test {
 	Union() {}
 
 	public Boolean procedure(int numTimes, int upperBound, int numElements) {
-		FiniteSet set1 = new Leaf();
-		FiniteSet set2 = new Leaf();
-		FiniteSet unionSet = set1.union(set2);
+		MultiSet set1 = new Leaf();
+		MultiSet set2 = new Leaf();
+		MultiSet unionSet = set1.union(set2);
 		int[] nums1 = new int[numElements];
 		int[] nums2 = new int[numElements];
 		Random rand = new Random();
@@ -300,13 +326,13 @@ class Inter extends Test {
 	Inter() {}
 
 	public Boolean procedure(int numTimes, int upperBound, int numElements) {
-		FiniteSet set1;
-		FiniteSet set2;
-		FiniteSet intersect;
+		MultiSet set1;
+		MultiSet set2;
+		MultiSet intersect;
 		int currentMax;
 		for (int i = 0; i < numTimes; i++) {
-			set1 = generateFiniteSet(upperBound, numElements);
-			set2 = generateFiniteSet(upperBound, numElements);
+			set1 = generateMultiSet(upperBound, numElements);
+			set2 = generateMultiSet(upperBound, numElements);
 			intersect = set1.inter(set2);
 			while (!intersect.isEmptyHuh()) {
 				currentMax = intersect.max();
@@ -328,13 +354,13 @@ class Diff extends Test {
 	Diff() {}
 
 	public Boolean procedure(int numTimes, int upperBound, int numElements) {
-		FiniteSet set1;
-		FiniteSet set2;
-		FiniteSet diff;
+		MultiSet set1;
+		MultiSet set2;
+		MultiSet diff;
 		int currentMax;
 		for (int i = 0; i < numTimes; i++) {
-			set1 = generateFiniteSet(upperBound, numElements);
-			set2 = generateFiniteSet(upperBound, numElements);
+			set1 = generateMultiSet(upperBound, numElements);
+			set2 = generateMultiSet(upperBound, numElements);
 			diff = set1.diff(set2);
 			while (!diff.isEmptyHuh()) {
 				currentMax = diff.max();
@@ -356,8 +382,8 @@ class Equal extends Test {
 	Equal() {}
 
 	public Boolean procedure(int numTimes, int upperBound, int numElements) {
-		FiniteSet set1;
-		FiniteSet set2;
+		MultiSet set1;
+		MultiSet set2;
 		int[] nums = new int[numElements];
 		Random rand = new Random();
 		int offset;
@@ -389,8 +415,8 @@ class Subset extends Test {
 	Subset() {}
 
 	public Boolean procedure(int numTimes, int upperBound, int numElements) {
-		FiniteSet superSet = new Leaf();
-		FiniteSet subSet = new Leaf();
+		MultiSet superSet = new Leaf();
+		MultiSet subSet = new Leaf();
 		int[] nums = new int[numElements];
 		Random rand = new Random();
 		passed = true;
@@ -414,4 +440,4 @@ class Subset extends Test {
 		}
 		return passed;
 	}
-}
+}*/

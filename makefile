@@ -5,14 +5,21 @@ JC = javac
 	$(JC) $(JFLAGS) $*.java
 
 CLASSES = \
+	Sequenced.java \
+	Sequence.java \
 	MultiSet.java \
 	Branch.java \
+	BranchSequence.java \
+	Concatenation.java \
 	Leaf.java \
-	#Tester.java 
+	Tester.java 
 
 default: classes
 
 classes: $(CLASSES:.java=.class)
 
+#javadoc: Javadoc MultiSet.java > ./javadoc/
+
 clean:
-	$(RM) *.class
+	$(RM) *.class 
+	rm -rfv ./javadoc/ && mkdir ./javadoc
