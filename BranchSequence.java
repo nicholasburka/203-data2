@@ -29,6 +29,3 @@ public class BranchSequence<T extends Comparable<T>> implements Sequence<T> {
 		return this;
 	}
 }
-
-//Need a Cat that
-//If a Cat tries to sequence a Branch, then the Branches turn into BranchSequence

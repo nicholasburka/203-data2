@@ -49,19 +49,21 @@ public class Tester {
 		printTest(e.testDescription, e.passed);
 		passed &= e.passed;
 
-		/*
+		
 		setUpTest();
 		Remove r = new Remove();
 		r.procedure(NUM_TIMES, UPPER_BOUND, numElements);
 		printTest(r.testDescription, r.passed);
 		passed &= r.passed;
 
+		
 		setUpTest();
 		Union u = new Union();
 		u.procedure(NUM_TIMES, UPPER_BOUND, numElements);
 		printTest(u.testDescription, u.passed);
 		passed &= u.passed;
 
+		/*
 		setUpTest();
 		Inter i = new Inter();
 		i.procedure(NUM_TIMES, UPPER_BOUND, numElements);
@@ -181,15 +183,24 @@ class MakeSet extends Test {
 }
 
 class Cardinality extends Test {
-	public String testDescription = "Check that a MultiSet of Integers has the number of elements added to it";
+	public String testDescription = "Check that a MultiSet of Integers has the number of elements added to it by sequencing through";
 
 	Cardinality() {}
 
 	public Boolean procedure(int numTimes, int upperBound, int numElements) {
 		MultiSet<Integer> set;
+		Sequence<Integer> seq;
+		int count;
 		for (int i = 0; i < numTimes; i++) {
 			set = generateMultiSet(upperBound, numElements);
 			this.passed = set.cardinality() == numElements;
+			seq = set.seq();
+			count = 0;
+			while (!seq.isEmptyHuh()) {
+				count++;
+				seq = seq.next();
+			}
+			this.passed = count == set.cardinality();
 			if (!passed) {
 				System.out.println("Cardinality of set " + set + " was not " + numElements);
 			}
@@ -213,12 +224,14 @@ class Empty extends Test {
 			this.passed = set.isEmptyHuh();
 			if (!passed) {
 				System.out.println("Empty set " + set + " was not empty");
+				return false;
 			}
 
 			set = generateMultiSet(upperBound, 1);
 			this.passed = !(set.isEmptyHuh());
 			if (!passed) {
 				System.out.println("Nonempty set " + set + " was empty");
+				return false;
 			}
 
 			set = generateMultiSet(upperBound, numElements);
@@ -226,6 +239,47 @@ class Empty extends Test {
 
 			if (!passed) {
 				System.out.println("Nonempty set " + set + " was empty");
+				return false;
+			}
+		}
+		return this.passed;
+	}
+}
+
+class Remove extends Test {
+	public String testDescription = "Check that the set produced by removing the root is equal to the union of its children \n by sequencing through one set to see that each element is a member of the other set with identical multiplicity";
+
+	Remove() {}
+
+	public Boolean procedure(int numTimes, int upperBound, int numElements) {
+		Branch<Integer> set;
+		MultiSet<Integer> setMinusOne;
+		Sequence<Integer> seq;
+		MultiSet<Integer> setUnion;
+		Integer el;
+		this.passed = true;
+		for (int i = 0; i < numTimes; i++) {
+			set = (Branch<Integer>) generateMultiSet(upperBound, numElements);
+			setMinusOne = set.remove(set.key, set.multiplicity);
+			setUnion = set.left.union(set.right);
+			seq = setMinusOne.seq();
+
+			while (!seq.isEmptyHuh()) {
+				el = seq.here();
+				System.out.println(setUnion);
+				System.out.println(setMinusOne);
+				System.out.println(el);
+				System.out.println(setUnion.member(el));
+				System.out.println(setUnion.member(el));
+				System.out.println(setMinusOne.multiplicity(el));
+				this.passed = passed && (setUnion.member(el) && (setUnion.multiplicity(el) == setMinusOne.multiplicity(el)));
+				if (!this.passed) {
+					System.out.println("Element " + el + " did not return the correct result.");
+					System.out.println(setUnion);
+					System.out.println(setMinusOne);
+					System.out.println(el);
+					return this.passed;
+				}
 			}
 		}
 		return this.passed;
@@ -271,24 +325,24 @@ class Remove extends Test {
 		return passed;
 	}
 }
-
+*/
 class Union extends Test {
 	public String testDescription = "Check that the union of two sets contains only elements that are in at least one of the sets, \nand that both sets are subsets of their union";
 
 	Union() {}
 
 	public Boolean procedure(int numTimes, int upperBound, int numElements) {
-		MultiSet set1 = new Leaf();
-		MultiSet set2 = new Leaf();
-		MultiSet unionSet = set1.union(set2);
+		MultiSet<Integer> set1 = new Leaf<Integer>();
+		MultiSet<Integer> set2 = new Leaf<Integer>();
+		MultiSet<Integer> unionSet = set1.union(set2);
 		int[] nums1 = new int[numElements];
 		int[] nums2 = new int[numElements];
 		Random rand = new Random();
 		Boolean passed = true;
-		int currentMax;
+		Integer currentMax;
 		for (int i = 0; i < numTimes; i++) {
-			set1 = new Leaf();
-			set2 = new Leaf();
+			set1 = new Leaf<Integer>();
+			set2 = new Leaf<Integer>();
 			unionSet = set1.union(set2);
 			for (int j = 0; j < numElements; j++) {
 				nums1[j] = rand.nextInt(upperBound);
@@ -315,11 +369,11 @@ class Union extends Test {
 				passed &= (set1.member(currentMax) || set2.member(currentMax)); 
 			}
 		}
-		Union.passed = passed;
+		this.passed = passed;
 		return passed;
 	}
 }
-
+/*
 class Inter extends Test {
 	public String testDescription = "Check that the intersection of two sets contains only elements that are in both of the sets.";
 

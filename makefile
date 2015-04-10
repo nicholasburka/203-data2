@@ -22,4 +22,3 @@ classes: $(CLASSES:.java=.class)
 
 clean:
 	$(RM) *.class 
-	rm -rfv ./javadoc/ && mkdir ./javadoc

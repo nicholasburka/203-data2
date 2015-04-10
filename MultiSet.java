@@ -128,11 +128,33 @@ public interface MultiSet<T extends Comparable<T>> extends Sequence<T> {
 	public Boolean subset(MultiSet<T> s);
 
 	/**
-	* Finds the maximum element of type T in the multiset
-	*
-	* @return   the maximum value of type T in the multiset
+	* Finds the height of a BST node in a MultiSet, which is the max distance of that
+	* node from a Leaf [where distance is defined only in downward motion through children].
+	* 
+	* 
+	* @return   int the height of the MultiSet node
 	*/
-	public T max();
+	public int height();
 
+	/**
+	* Finds the height of a BST node in a MultiSet, which is the max distance of that
+	* node from a Leaf [where distance is defined only in downward motion through children],
+	* and recalculates rather than relying on precalculated values. This is UNUSED AND MUTATIVE.
+	* 
+	* @param   a Boolean flag that means nothing
+	* @return   int the height of the MultiSet node
+	*/
+	public int height(Boolean on);
+
+	/**
+	* Finds the loadFactor of a BST node in a MultiSet, which is the difference between
+	* the height of the left child and right child. In the AVL tree, the absolute value
+	* should never be greater than 1
+	*
+	* @return    int the loadFactor of the MultiSet
+	*/
+	public int loadFactor();
+
+	public T max();
 
 }

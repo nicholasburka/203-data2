@@ -57,9 +57,14 @@ public class Leaf<T extends Comparable<T>> implements MultiSet<T> {
 		return true;
 	}
 
+	
 	public T max() {
 		throw new RuntimeException();
 	}
+/*
+	public Branch<T> min() {
+		throw new RuntimeException();
+	}*/
 
 	//SEQUENCES
 	public Sequence<T> seq() {
@@ -75,5 +80,17 @@ public class Leaf<T extends Comparable<T>> implements MultiSet<T> {
 	public Sequence<T> next() {
 		//smh, calling next on a Leaf<T>
 		return this;
+	}
+
+	//AVL Trees
+	public int height() {
+		return 0;
+	}
+	public int height(Boolean on) {
+		return 0;
+	}
+
+	public int loadFactor() {
+		return 0;
 	}
 }

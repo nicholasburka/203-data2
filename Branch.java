@@ -1,22 +1,17 @@
 public class Branch<T extends Comparable<T>> implements MultiSet<T> {
-	private MultiSet<T> left;
-	private T key;
-	private int multiplicity;
-	private MultiSet<T> right;
+	public MultiSet<T> left;
+	public T key;
+	public int multiplicity;
+	public MultiSet<T> right;
+	public int height;
 
 	public Branch (MultiSet<T> left, T key, int multiplicity, MultiSet<T> right) {
 		this.left = left;
 		this.key = key;
 		this.multiplicity = multiplicity;
 		this.right = right;
+		this.height = 1 + Math.max(this.left.height(), this.right.height());
 	}
-
-	//what's here
-	//what's next
-	//is there anything here?
-	//make a sequence that makes each thing appear x (multiplicity) times
-
-
 
 	@Override public String toString() {
 		return "new Branch(" + this.left + "," + this.key + "," + this.multiplicity + "," + this.right + ")";
@@ -32,7 +27,7 @@ public class Branch<T extends Comparable<T>> implements MultiSet<T> {
 
 	public Boolean member(T t) {
 		int comp = t.compareTo(this.key);
-		if (comp == 0) {
+		if (comp == 0 && this.multiplicity > 0) {
 			return true;
 		} else if (comp > 0) {
 			return this.right.member(t);
@@ -54,24 +49,28 @@ public class Branch<T extends Comparable<T>> implements MultiSet<T> {
 	
 	public MultiSet<T> add (T t) {
 		int comp = t.compareTo(this.key);
+		Branch<T> newThis;
 		if (comp == 0) {
-			return new Branch<T>(this.left, this.key, this.multiplicity + 1, this.right);
+			newThis =  new Branch<T>(this.left, this.key, this.multiplicity + 1, this.right);
 		} else if (comp > 0) {
-			return new Branch<T>(this.left, this.key, this.multiplicity, this.right.add(t));
+			newThis =  new Branch<T>(this.left, this.key, this.multiplicity, this.right.add(t));
 		} else {
-			return new Branch<T>(this.left.add(t), this.key, this.multiplicity, this.right);
+			newThis = new Branch<T>(this.left.add(t), this.key, this.multiplicity, this.right);
 		}
+		return newThis.avlCheckInsert();
 	}
 
 	public MultiSet<T> add (T t, int num) {
 		int comp = t.compareTo(this.key);
+		Branch<T> newThis;
 		if (comp == 0) {
-			return new Branch<T>(this.left, this.key, this.multiplicity + num, this.right);
+			newThis = new Branch<T>(this.left, this.key, this.multiplicity + num, this.right);
 		} else if (comp > 0) {
-			return new Branch<T>(this.left, this.key, this.multiplicity, this.right.add(t));
+			newThis = new Branch<T>(this.left, this.key, this.multiplicity, this.right.add(t));
 		} else {
-			return new Branch<T>(this.left.add(t), this.key, this.multiplicity, this.right);
+			newThis = new Branch<T>(this.left.add(t), this.key, this.multiplicity, this.right);
 		}
+		return newThis.avlCheckInsert();
 	}
 
 	/*public MultiSet successor*/
@@ -81,7 +80,9 @@ public class Branch<T extends Comparable<T>> implements MultiSet<T> {
 		if (comp == 0) {
 			if (this.multiplicity > 1) {
 				return new Branch<T> (this.left, this.key, this.multiplicity - 1, this.right);
-			} else return this.left.union(this.right);
+			} else {
+				return new Branch<T> (this.left, this.key, 0, this.right);
+			}
 		} else if (comp > 0) {
 			return new Branch<T> (this.left, this.key, this.multiplicity, this.right.remove(t));
 		} else {
@@ -94,7 +95,9 @@ public class Branch<T extends Comparable<T>> implements MultiSet<T> {
 		if (comp == 0) {
 			if (this.multiplicity > num) {
 				return new Branch<T> (this.left, this.key, this.multiplicity - num, this.right);
-			} else return this.left.union(this.right);
+			} else {
+				return new Branch<T> (this.left, this.key, 0, this.right);//this.left.union(this.right);
+			}
 		} else if (comp > 0) {
 			return new Branch<T> (this.left, this.key, this.multiplicity, this.right.remove(t));
 		} else {
@@ -138,6 +141,7 @@ public class Branch<T extends Comparable<T>> implements MultiSet<T> {
 			&& this.right.subset(s);
 	}
 
+	
 	public T max () {
 		if (this.right.isEmptyHuh()) {
 			return this.key;
@@ -145,6 +149,14 @@ public class Branch<T extends Comparable<T>> implements MultiSet<T> {
 			return this.right.max();
 		}
 	}
+/*
+	public Branch<T> min () {
+		if (this.left.isEmptyHuh()) {
+			return this;
+		} else {
+			return this.left.min();
+		}
+	}*/
 
 	//TIME FOR SEQUENCES!!!
 	public Sequence<T> seq() {
@@ -159,5 +171,82 @@ public class Branch<T extends Comparable<T>> implements MultiSet<T> {
 		return this.seq().next();
 	}
 
+	//AVL Trees
+	public int height() {
+		return this.height;
+	}
+
+	public int height(Boolean on) {
+		int height = 1 + Math.max(this.left.height(true), this.right.height(true));
+		this.height = height;
+		return height;
+	}
+
+	public int loadFactor() {
+		return left.height() - right.height();
+	}
+
+	public Branch<T> avlCheckInsert() {
+		Branch<T> newThis = this;
+		//left case
+		if (this.loadFactor() > 1) {
+			if (this.left.loadFactor() == -1) {
+				Branch<T> theLeft = ((Branch<T>) this.left);
+				newThis = new Branch<T>(theLeft.rotateLeft(), this.key, this.multiplicity, this.right);
+			} 
+			newThis = newThis.rotateRight();
+
+		//right case
+		} else if (this.loadFactor() < -1) {
+			if (this.right.loadFactor() == 1) {
+				Branch<T> theRight = ((Branch<T>) this.right);
+				newThis = new Branch<T>(this.left, this.key, this.multiplicity, theRight.rotateRight());
+			}
+			newThis = newThis.rotateLeft();
+		}
+
+		if (newThis.loadFactor() > 1 || newThis.loadFactor() < -1) {
+			System.out.println(newThis.loadFactor());
+			System.out.println(newThis);
+		} 
+		return newThis;
+	}
+
+	private Branch<T> rotateRight() {
+		Branch<T> theLeft = (Branch<T>) this.left;
+		Branch<T> newParent = new Branch<T>(theLeft.left, 
+											theLeft.key, 
+											theLeft.multiplicity,
+											 new Leaf<T>());
+		Branch<T> newThis = new Branch<T>(theLeft.right,
+										this.key,
+										this.multiplicity,
+										this.right);
+		newParent.right = newThis;
+		return newParent;
+	}
+
+	private Branch<T> rotateLeft() {
+		Branch<T> theRight = (Branch<T>) this.right;
+		Branch<T> newParent = new Branch<T>(new Leaf<T>(), 
+											theRight.key, 
+											theRight.multiplicity, 
+											theRight.right);
+		Branch<T> newThis = new Branch<T>(this.left, 
+										this.key, 
+										this.multiplicity, 
+										theRight.left);
+		newParent.left = newThis;	
+		return newParent;
+	}
+
+/*
+	private Branch<T> predecessor() {
+		return this.left.max();
+	}
+
+	private Branch<T> sucessor() {
+		return this.right.min();
+	}*/
 
 }
