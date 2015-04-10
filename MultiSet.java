@@ -134,4 +134,5 @@ public interface MultiSet<T extends Comparable<T>> extends Sequence<T> {
 	*/
 	public T max();
 
+
 }
